@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="qwe.css">
+</head>
+<body class="dark">
+    <!-- Loading Screen -->
+    <div class="loader-container">
+        <div class="loader-content">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="toggle">
+            <input class="toggle-input" type="checkbox" id="themeToggle"/>
+            <div class="toggle-bg"></div>
+            <div class="toggle-switch">
+                <div class="toggle-switch-figure"></div>
+                <div class="toggle-switch-figureAlt"></div>
+            </div>
+        </div>
+    </div>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="row justify-content-center min-vh-100 align-items-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4 animated-header">Sign Up</h2>
+                        <form id="signupForm" novalidate>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <input type="text" class="form-control" id="username" required placeholder="Username">
+                                </div>
+                                <div class="invalid-feedback">Username is required.</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" class="form-control" id="email" required placeholder="Email">
+                                </div>
+                                <div class="invalid-feedback">Please enter a valid email.</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" class="form-control" id="password" required placeholder="Password">
+                                </div>
+                                <div class="invalid-feedback">Password must be at least 8 characters long and contain numbers and letters.</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" class="form-control" id="confirmPassword" required placeholder="Confirm Password">
+                                </div>
+                                <div class="invalid-feedback">Passwords do not match.</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                <span class="btn-text">Sign Up</span>
+                            </button>
+                            <div class="alert alert-danger d-none" id="signupError"></div>
+                        </form>
+                        <p class="text-center mt-3">
+                            Already have an account? <a href="/login">Login</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // Loading screen handler
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.querySelector('.loader-container').classList.add('fade-out');
+            }, 1500); // Show loader for 1.5 seconds
+        });
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const html = document.documentElement;
+
+        // Check saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        body.className = savedTheme;
+        html.setAttribute('data-bs-theme', savedTheme);
+        themeToggle.checked = savedTheme === 'light';
+
+        function updateParticles(theme) {
+            const particleColor = theme === 'light' ? '#9D4EDD' : '#ffffff';
+            if (window.pJSDom && window.pJSDom[0]) {
+                window.pJSDom[0].pJS.particles.color.value = particleColor;
+                window.pJSDom[0].pJS.particles.line_linked.color = particleColor;
+                window.pJSDom[0].pJS.fn.particlesRefresh();
+            }
+        }
+
+        themeToggle.addEventListener('change', function() {
+            const newTheme = this.checked ? 'dark' : 'light';
+            body.className = newTheme;
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateParticles(newTheme);
+        });
+
+        // Initial particles configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: savedTheme === 'light' ? '#9D4EDD' : '#ffffff' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: false },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: savedTheme === 'light' ? '#9D4EDD' : '#ffffff',
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: 'none',
+                    random: false,
+                    straight: false,
+                    out_mode: 'out',
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: {
+                    onhover: { enable: true, mode: 'repulse' },
+                    onclick: { enable: true, mode: 'push' },
+                    resize: true
+                }
+            },
+            retina_detect: true
+        });
+    </script>
+</body>
+</html>

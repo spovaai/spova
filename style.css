@@ -1,6 +1,10 @@
 html, body {
     height: 100%;
     overflow: hidden;
+    position: fixed;
+    width: 100%;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
 }
 
 .header {
@@ -10,24 +14,62 @@ html, body {
     left: 0;
     right: 0;
     z-index: 1000;
-    text-align: center;
+    padding-top: env(safe-area-inset-top, 0px);
+}
+
+.logo-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-container {
+    position: relative;
+    z-index: 1000;
+    margin-left: auto; /* Move to right side */
+}
+
+.nav-toggle {
+    background: none;
+    border: none;
+    color: var(--bs-secondary);
+    font-size: 1.5rem;
+    padding: 0.8rem;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-toggle:hover {
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    transform: scale(1.05);
 }
 
 .chat-container {
-    height: calc(100vh - 120px);
-    max-height: calc(100vh - 120px);
-    margin: 60px 0 0;
-    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 60px;
+    bottom: env(safe-area-inset-bottom, 0px);
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
-    padding: 0;
+    background: var(--bs-dark);
 }
 
 .chat-messages {
+    flex: 1;
     overflow-y: auto;
     padding: 0.2rem 0.2rem;
     background: var(--bs-dark);
-    flex-grow: 1;
+    -webkit-overflow-scrolling: touch;
 }
 
 .message {
@@ -47,11 +89,34 @@ html, body {
 .message-content pre {
     margin: 0.5rem 0;
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.2) !important;
+    background: #252525 !important;
+    position: relative;
+    border: 1px solid #333;
 }
 
-.message-content pre {
+.message-content code {
+    display: block;
+    padding: 1.2rem 1.5rem 1.2rem 4rem;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+    counter-reset: line;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.message-content code > span {
+    display: block;
     position: relative;
+}
+
+.message-content code > span:before {
+    counter-increment: line;
+    content: counter(line);
+    position: absolute;
+    left: -2.5rem;
+    color: #666;
+    text-align: right;
+    width: 2rem;
 }
 
 .copy-btn {
@@ -72,32 +137,12 @@ html, body {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.message-content code {
-    display: block;
-    padding: 1rem 1rem 1rem 3.5rem;
-    white-space: pre-wrap;
-    font-family: 'Courier New', monospace;
-    counter-reset: line;
-    line-height: 1.5;
-}
-
-.message-content code > span {
-    display: block;
-    position: relative;
-}
-
-.message-content code > span:before {
-    counter-increment: line;
-    content: counter(line);
-    position: absolute;
-    left: -2.5rem;
-    color: #666;
-    text-align: right;
-    width: 2rem;
-}
-
-.message {
-    position: relative;
+.code-header {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 8px 8px 0 0;
+    font-size: 0.9rem;
+    color: #aaa;
 }
 
 .message-copy-btn {
@@ -106,25 +151,30 @@ html, body {
     right: 8px;
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
     color: #fff;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .message:hover .message-copy-btn {
     opacity: 1;
 }
 
-.code-header {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.5rem 1rem;
-    border-radius: 8px 8px 0 0;
-    font-size: 0.9rem;
-    color: #aaa;
+.message-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.message-copy-btn:active {
+    transform: scale(0.95);
 }
 
 .message.message-user {
@@ -164,84 +214,13 @@ html, body {
     flex-shrink: 0;
 }
 
-.message.message-ai:hover .bot-avatar {
-    transform: scale(1.1);
-}
-
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    margin-left: 45px;
-}
-
-.dot {
-    width: 8px;
-    height: 8px;
-    margin: 0 2px;
-    background-color: var(--bs-primary);
-    border-radius: 50%;
-    display: inline-block;
-    animation: bounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator .message-content {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-}
-
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-}
-
-.welcome-message {
-    color: var(--bs-secondary);
-}
-
-.welcome-message ul {
-    margin: 1rem 0;
-}
-
-.welcome-message li {
-    margin: 0.5rem 0;
-    color: var(--bs-primary);
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s ease;
-}
-
-.welcome-message li:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    text-decoration: underline;
-}
-
-.error-message {
-    color: var(--bs-danger);
-    padding: 0.8rem;
-    border-radius: 8px;
-    background-color: rgba(var(--bs-danger-rgb), 0.1);
-    margin-bottom: 1rem;
-}
-
 .chat-input {
     padding: 1rem;
     background: var(--bs-dark);
     border-top: 1px solid var(--bs-secondary);
-}
-
-textarea {
-    resize: none;
-    min-height: 80px;
-    border-radius: 12px !important;
-    border: 1px solid var(--bs-secondary) !important;
-    background-color: var(--bs-dark) !important;
-    padding: 12px !important;
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+    position: relative;
+    z-index: 1;
 }
 
 .input-container {
@@ -250,12 +229,22 @@ textarea {
     position: relative;
 }
 
+textarea {
+    resize: none;
+    min-height: 12px;
+    border-radius: 12px !important;
+    border: 1px solid var(--bs-secondary) !important;
+    background-color: var(--bs-dark) !important;
+    padding: 12px !important;
+}
+
 .button-group {
     position: absolute;
     left: 10px;
     top: 10px;
     display: flex;
     gap: 8px;
+    z-index: 2;
 }
 
 .action-btn {
@@ -291,53 +280,275 @@ textarea.form-control {
     padding-right: 50px !important;
 }
 
-/* Sidenav styles */
-.sidenav {
-    position: fixed;
-    top: 0;
-    right: -250px; /* Hide initially */
-    width: 250px;
-    height: 100%;
-    background-color: #333;
-    transition: right 0.3s ease-in-out;
-    z-index: 720;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
-}
-
-/* Show sidenav when active */
-.sidenav.active {
-    right: 0;
-}
-
-/* Close button styles */
-.close-btn {
-    font-size: 30px;
-    color: white;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+.dropdown-menu {
     position: absolute;
-    top: 15px;
-    right: 20px;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 280px;
+    background: var(--bs-dark);
+    border: 1px solid var(--bs-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: none;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
 }
 
-/* Navigation options styles */
-.sidenav ul {
-    list-style-type: none;
-    padding: 20px;
+.dropdown-menu.show {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidenav ul li {
-    margin: 15px 0;
-}
-
-.sidenav ul li a {
-    color: white;
+.dropdown-menu a {
+    display: block;
+    padding: 12px 16px;
+    color: var(--bs-light);
     text-decoration: none;
-    font-size: 18px;
-    transition: color 0.3s;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
 }
 
-.sidenav ul li a:hover {
-    color: #ccc;
+.dropdown-menu a:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    transform: translateX(5px);
+}
+
+.welcome-message {
+    color: var(--bs-secondary);
+    padding: 1rem;
+}
+
+.welcome-message h2 {
+    color: var(--bs-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.welcome-message ul {
+    margin: 1rem 0;
+    padding: 0;
+}
+
+.welcome-message li {
+    margin: 0.5rem 0;
+    color: var(--bs-primary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--bs-primary);
+    transition: all 0.2s ease;
+    list-style: none;
+}
+
+.welcome-message li:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    transform: translateY(-1px);
+}
+
+.user-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-secondary);
+}
+
+.user-info .email {
+    display: block;
+    padding: 12px 16px;
+    color: var(--bs-secondary);
+    font-size: 0.9rem;
+    word-break: break-all;
+}
+
+#option-3 {
+    color: var(--bs-danger);
+    font-weight: 500;
+}
+
+#option-3:hover {
+    background-color: rgba(var(--bs-danger-rgb), 0.1);
+    color: var(--bs-danger);
+}
+
+@media (max-width: 768px) {
+    .chat-container {
+        top: 50px;
+    }
+    .chat-input {
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    }
+    .message {
+        max-width: 95%;
+    }
+    .dropdown-menu {
+        position: fixed;
+        top: 70px;
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+        margin: 0;
+        border-radius: 20px;
+        padding: 1.2rem;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    .chat-container {
+        height: -webkit-fill-available;
+    }
+    .chat-input {
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-item {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+}
+
+.menu-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+.menu-item:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .menu-item {
+        padding: 1rem !important;
+    }
+}
+
+/* Add submenu styles */
+.submenu {
+    display: none;
+    padding-left: 2rem;
+    margin-top: 0.5rem;
+}
+
+.submenu.show {
+    display: block;
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.submenu .menu-item {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    margin-left: 0.2rem;
+    margin-bottom: 1rem;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.deep-thinking {
+    color: var(--bs-primary);
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.processing-time {
+    color: var(--bs-secondary);
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: var(--bs-primary);
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator .message-content {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    padding: 12px 20px;
+    margin-left: 10px;
+}
+
+.typing-indicator .dot {
+    display: ;
+}
+
+.typing-indicator.deep-thinking .dot {
+    display: none;
+}
+
+.deep-thinking {
+    color: var(--bs-primary);
+    font-size: 1.1rem;
+    margin: 0;
+    background: linear-gradient(90deg, var(--bs-primary), #fff, var(--bs-primary));
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
+@keyframes bounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
