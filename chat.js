@@ -7,13 +7,98 @@ class ChatInterface {
             chatForm: document.getElementById('chatForm'),
             userInput: document.getElementById('userInput'),
             chatMessages: document.getElementById('chatMessages'),
+            deepThinkButton: document.getElementById('deepThinkButton'),
             fileInput: document.getElementById('fileInput'),
-            deepThinkButton: document.getElementById('deepThinkButton')
+            navToggle: document.getElementById('nav-toggle'),
+            navMenu: document.getElementById('nav-menu')
         };
 
         this.isDeepThinking = false;
         this.initialize();
         this.setupExamplePrompts();
+        this.setupNavigation();
+    }
+
+    setupNavigation() {
+        const navToggle = this.elements.navToggle;
+        const navMenu = this.elements.navMenu;
+        const settingsToggle = document.querySelector('.settings-toggle');
+        const settingsSubmenu = document.getElementById('settings-submenu');
+
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('show');
+
+            // Add animation classes
+            if (navMenu.classList.contains('show')) {
+                navToggle.style.transform = 'rotate(90deg)';
+            } else {
+                navToggle.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Settings submenu toggle
+        if (settingsToggle) {
+            settingsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                settingsSubmenu.classList.toggle('show');
+                const chevron = settingsToggle.querySelector('.fa-chevron-right');
+                chevron.style.transform = settingsSubmenu.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+            });
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.refresh-messages')) {
+                e.preventDefault();
+                this.elements.chatMessages.innerHTML = '';
+                this.elements.chatMessages.innerHTML = `
+                    <div class="welcome-message text-center p-4">
+                        <h2>Welcome to spovaAI Chat</h2>
+                        <p>Try these example prompts:</p>
+                        <ul class="list-unstyled">
+                            <li>"Tell me about artificial intelligence"</li>
+                            <li>"How does photosynthesis work?"</li>
+                            <li>"Write a short story about space exploration"</li>
+                            <li>"Explain quantum computing in simple terms"</li>
+                        </ul>
+                        <p class="mt-3"><small>Use the deep thinking mode <i class="fa fa-book"></i> for more detailed responses</small></p>
+                    </div>`;
+                localStorage.removeItem('chatHistory');
+                return;
+            }
+            
+            if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                navMenu.classList.remove('show');
+                if (settingsSubmenu) {
+                    settingsSubmenu.classList.remove('show');
+                    const chevron = settingsToggle.querySelector('.fa-chevron-right');
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+                navToggle.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Handle touch events for mobile
+        document.addEventListener('touchstart', (e) => {
+            if (!navMenu.contains(e.target) && !navToggle.contains(e.target)) {
+                navMenu.classList.remove('show');
+                if (settingsSubmenu) {
+                    settingsSubmenu.classList.remove('show');
+                    const chevron = settingsToggle.querySelector('.fa-chevron-right');
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+                navToggle.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Add transitions
+        navToggle.style.transition = 'transform 0.3s ease';
+        if (settingsToggle) {
+            const chevron = settingsToggle.querySelector('.fa-chevron-right');
+            chevron.style.transition = 'transform 0.3s ease';
+        }
     }
 
     setupExamplePrompts() {
@@ -31,8 +116,11 @@ class ChatInterface {
         this.elements.userInput.placeholder = "Type your message...";
         this.elements.chatForm.querySelector('button[type="submit"]').disabled = false;
 
-        // Keep welcome message visible
-        if (!this.elements.chatMessages.querySelector('.message')) {
+        // Load chat history from localStorage
+        const savedMessages = localStorage.getItem('chatHistory');
+        if (savedMessages) {
+            this.elements.chatMessages.innerHTML = savedMessages;
+        } else if (!this.elements.chatMessages.querySelector('.message')) {
             this.elements.chatMessages.innerHTML = `
                 <div class="welcome-message text-center p-4">
                     <h2>Welcome to spovaAI Chat</h2>
@@ -47,22 +135,16 @@ class ChatInterface {
                 </div>`;
         }
 
-        // Set up event listeners
         this.elements.chatForm.addEventListener('submit', (e) => this.handleSubmit(e));
-        this.elements.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
         this.elements.deepThinkButton.addEventListener('click', () => this.toggleDeepThinking());
-
-        // Load marked.js for markdown support
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-        document.head.appendChild(script);
+        this.elements.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
     }
 
     toggleDeepThinking() {
         this.isDeepThinking = !this.isDeepThinking;
         this.elements.deepThinkButton.classList.toggle('active');
-        this.elements.deepThinkButton.innerHTML = this.isDeepThinking ? 
-            '<i class="fa fa-book"></i>fakyu' : 
+        this.elements.deepThinkButton.innerHTML = this.isDeepThinking ?
+            '<i class="fa fa-book"></i> Deep' :
             '<i class="fa fa-book"></i>';
     }
 
@@ -71,19 +153,42 @@ class ChatInterface {
         const userInput = this.elements.userInput.value.trim();
         if (!userInput) return;
 
-        // Add user message
         this.addMessage(userInput, 'user');
         this.elements.userInput.value = '';
-
-        // Show typing indicator
-        this.showTypingIndicator();
+        const startTime = Date.now();
+        this.showTypingIndicator(this.isDeepThinking);
 
         try {
-            // Add deep thinking delay if enabled
-            if (this.isDeepThinking) {
-                await new Promise(resolve => setTimeout(resolve, 3000));
-            } else {
-                await new Promise(resolve => setTimeout(resolve, 1000));
+            // First, query the knowledge base
+            const knowledgeResponse = await fetch('/query_knowledge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: userInput }),
+            });
+
+            const knowledgeData = await knowledgeResponse.json();
+            let finalPrompt = userInput;
+
+            if (knowledgeData.found) {
+                // Add 1.5 second delay for database responses
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                finalPrompt = `Based on this context: "${knowledgeData.content}", please answer: ${userInput}`;
+            }
+
+            // Check for specific question
+            if (userInput.toLowerCase() === "who are u") {
+                this.removeTypingIndicator();
+                this.addMessage("I am spovaAI, your intelligent chat assistant that helps you with various tasks and questions.", 'ai');
+                return;
+            }
+
+            // Check for questions about Raffael
+            if (userInput.toLowerCase().includes("raffael")) {
+                this.removeTypingIndicator();
+                this.addMessage("Raffael is the most handsome person! And Tosha is a very pretty girlfriend - she's wonderful, caring, and makes Raffael's life brighter every day!", 'ai');
+                return;
             }
 
             const response = await fetch(this.API_URL, {
@@ -94,31 +199,28 @@ class ChatInterface {
                 body: JSON.stringify({
                     contents: [{
                         parts: [{
-                            text: this.isDeepThinking ? 
-                                `Please provide a detailed, comprehensive response with multiple perspectives and examples. Consider the following request carefully: ${userInput}` :
-                                userInput,
+                            text: this.isDeepThinking ?
+                                `Please provide a detailed, comprehensive response with multiple perspectives and examples. Consider the following request carefully, minimum answer 300 words: ${finalPrompt}` :
+                                finalPrompt,
                         }],
                     }],
                 }),
             });
 
             const data = await response.json();
-            console.log('API Response:', data);
 
             if (!response.ok) {
-                throw new Error(data.error?.message || 'Failed to get response from spovaAI API');
+                throw new Error(data.error?.message || 'Failed to get response from AI');
             }
 
-            // Get bot response
             const botResponse = data.candidates[0].content.parts[0].text;
 
-            // Remove typing indicator and add AI response
             this.removeTypingIndicator();
             this.addMessage(botResponse, 'ai');
         } catch (error) {
-            console.error('spovi API error:', error);
+            console.error('API error:', error);
             this.removeTypingIndicator();
-            this.showError("Failed to get response from spovaAI. Error: " + error.message);
+            this.showError("Failed to get response: " + error.message);
         }
     }
 
@@ -127,21 +229,45 @@ class ChatInterface {
         if (!file) return;
 
         try {
-            // For now, just append the filename to the input
-            const filename = file.name;
-            this.elements.userInput.value += `\nAttached file: ${filename}`;
+            const formData = new FormData();
+            formData.append('file', file);
+
+            this.addMessage(`Uploading file: ${file.name}`, 'user');
+            this.showTypingIndicator();
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to upload file');
+            }
+
+            this.removeTypingIndicator();
+            this.addMessage(`File uploaded successfully: ${file.name}. You can now ask questions about its contents.`, 'ai');
 
             // Reset file input
             this.elements.fileInput.value = '';
         } catch (error) {
             console.error('File upload error:', error);
+            this.removeTypingIndicator();
             this.showError("Failed to upload file: " + error.message);
         }
     }
 
-    addMessage(text, sender) {
+    addMessage(content, sender, startTime = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message message-${sender}`;
+
+        if (sender === 'ai' && startTime && this.isDeepThinking) {
+            const processingTime = document.createElement('div');
+            processingTime.className = 'processing-time';
+            processingTime.textContent = `Processing time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`;
+            messageDiv.appendChild(processingTime);
+        }
 
         if (sender === 'ai') {
             const avatar = document.createElement('div');
@@ -153,14 +279,14 @@ class ChatInterface {
         contentDiv.className = 'message-content';
 
         if (window.marked && sender === 'ai') {
-            const parsed = marked.parse(text);
+            const parsed = marked.parse(content);
             contentDiv.innerHTML = parsed.replace(/<pre><code class="language-(\w+)">([\s\S]+?)<\/code><\/pre>/g, 
                 (_, lang, code) => {
                     const lines = code.split('\n').map(line => `<span>${line}</span>`).join('\n');
                     return `
                         <pre>
                             <div class="code-header">${lang}</div>
-                            <button class="copy-btn">Copy</button>
+                            <button class="copy-btn" onclick="event.stopPropagation()">Copy</button>
                             <code class="language-${lang}">${lines}</code>
                         </pre>`;
                 }
@@ -169,42 +295,60 @@ class ChatInterface {
             // Add copy button for code blocks
             contentDiv.querySelectorAll('pre').forEach(pre => {
                 const copyBtn = pre.querySelector('.copy-btn');
-                copyBtn.addEventListener('click', () => {
+                copyBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const code = pre.querySelector('code').textContent;
-                    navigator.clipboard.writeText(code);
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+                    }).catch(err => console.error('Failed to copy:', err));
                 });
             });
         } else {
-            contentDiv.textContent = text;
+            contentDiv.textContent = content;
         }
 
         // Add copy button for entire message
-        const copyMessageBtn = document.createElement('button');
-        copyMessageBtn.className = 'message-copy-btn';
-        copyMessageBtn.textContent = 'Copy';
-        copyMessageBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(text);
-            copyMessageBtn.textContent = 'Copied!';
-            setTimeout(() => copyMessageBtn.textContent = 'Copy', 2000);
-        });
-        messageDiv.appendChild(copyMessageBtn);
+        if (sender === 'ai') {
+            const copyMessageBtn = document.createElement('button');
+            copyMessageBtn.className = 'message-copy-btn';
+            copyMessageBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyMessageBtn.title = 'Copy message';
+            
+            // Get the actual text content without HTML tags for copying
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            const textContent = tempDiv.textContent;
+
+            copyMessageBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(textContent).then(() => {
+                    copyMessageBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        copyMessageBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    }, 2000);
+                }).catch(err => console.error('Failed to copy:', err));
+            });
+            messageDiv.appendChild(copyMessageBtn);
+        }
 
         messageDiv.appendChild(contentDiv);
         this.elements.chatMessages.appendChild(messageDiv);
         this.scrollToBottom();
+        localStorage.setItem('chatHistory', this.elements.chatMessages.innerHTML);
     }
 
-    showTypingIndicator() {
+    showTypingIndicator(isDeepThinking = false) {
         const indicator = document.createElement('div');
         indicator.className = 'typing-indicator message-ai';
         indicator.innerHTML = `
             <div class="bot-avatar"></div>
             <div class="message-content">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
+                ${isDeepThinking ? '<div class="deep-thinking">Deep Thinking...</div>' : ` `}
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                
             </div>
         `;
         this.elements.chatMessages.appendChild(indicator);
@@ -231,8 +375,6 @@ class ChatInterface {
     }
 }
 
-// Initialize chat interface when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new ChatInterface();
 });
-
