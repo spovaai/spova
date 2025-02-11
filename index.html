@@ -1,99 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
-    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <title>spovaAI Chat Interface</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <!-- Add marked.js for markdown support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body class="vh-100 d-flex flex-column position-relative overflow-hidden">
-    <!-- Side Navigation -->
-    <div class="sidenav" id="sidenav">
-        <div class="sidenav-content">
-            <div class="d-flex justify-content-between align-items-center p-3">
-                <h5 class="mb-0">Settings</h5>
-                <button class="btn-close" id="close-nav"></button>
-            </div>
-            <div class="p-3">
-                <div class="mb-3">
-                    <label class="form-label">Theme</label>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="theme-toggle">
-                        <label class="form-check-label" for="theme-toggle">Dark Mode</label>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Chat History</label>
-                    <button class="btn btn-secondary w-100" id="clear-history">
-                        <i class="bi bi-trash"></i> Clear History
-                    </button>
+<body>
+
+    <!-- Button to toggle the navigation -->
+<button id="nav-toggle" class="nav-toggle">☰</button>
+
+<!-- Side Navigation -->
+<div id="sidenav" class="sidenav">
+    <button id="close-nav" class="close-btn">×</button>
+    <ul>
+        <li><a href="#" id="option-1">Option 1</a></li>
+        <li><a href="#" id="option-2">Option 2</a></li>
+        <li><a href="#" id="option-3">Option 3</a></li>
+    </ul>
+</div>
+    
+    <div class="container-fluid h-100">
+        <div class="header py-3 border-bottom">
+            <div class="container">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="https://i.ibb.co.com/1fFqV117/1739184514-picsay.png" alt="spovaAI Chat Logo" height="40">
                 </div>
             </div>
         </div>
-    </div>
-
-    <nav class="navbar">
-        <div class="container-fluid px-0">
-            <span class="navbar-brand">
-                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="AI Assistant Logo" class="nav-logo">
-                AI Assistant
-            </span>
-            <button class="nav-toggle" id="nav-toggle">
-                <i class="bi bi-list"></i>
-            </button>
-        </div>
-    </nav>
-
-    <div class="container-fluid flex-grow-1 d-flex flex-column">
-        <div class="row flex-grow-1">
-            <div class="col-12 col-md-8 col-lg-6 mx-auto d-flex flex-column">
-                <div id="chat-messages" class="chat-container flex-grow-1 mb-3">
-                    <div class="message bot">
-                        <div class="message-content">
-                            Hello! I'm an AI assistant. How can I help you today? 💡
+        <div class="row h-100 pt-4">
+            <div class="col-12">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="welcome-message text-center p-4">
+                            <h2>Welcome to Gemini Chat</h2>
+                            <p>Try these example prompts:</p>
+                            <ul class="list-unstyled">
+                                <li>"Tell me about artificial intelligence"</li>
+                                <li>"How does photosynthesis work?"</li>
+                                <li>"Write a short story about space exploration"</li>
+                                <li>"Explain quantum computing in simple terms"</li>
+                            </ul>
+                            <p class="mt-3"><small>Use the deep thinking mode <i class="fa fa-book"></i> for more detailed responses</small></p>
                         </div>
                     </div>
-                </div>
 
-                <div id="typing-indicator" class="typing-indicator d-none">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="deep-thinking d-none">
-                        <i class="bi bi-brain"></i>
-                        Deep thinking...
+                    <div class="chat-input">
+                        <form id="chatForm">
+                            <div class="input-container">
+                                <div class="button-group">
+                                    <label class="action-btn" for="fileInput" title="Attach file">
+                                        <i class="fa fa-paperclip"></i>
+                                        <input type="file" id="fileInput" class="d-none">
+                                    </label>
+                                    <button type="button" class="action-btn" id="deepThinkButton" title="Deep thinking mode">
+                                        <i class="fa fa-book"></i>
+                                    </button>
+                                </div>
+                                <textarea class="form-control" id="userInput" rows="3" placeholder="Type your message..."></textarea>
+                                <button class="send-btn" type="submit">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <form id="chat-form" class="mt-3">
-                    <div class="input-group">
-                        <input type="text" 
-                               id="message-input" 
-                               class="form-control" 
-                               placeholder="Type your message... Use /imagine for AI images"
-                               required>
-                        <button type="button" class="btn btn-icon" title="Attach file">
-                            <i class="bi bi-paperclip"></i>
-                            <input type="file" id="file-input" class="d-none">
-                        </button>
-                        <button type="button" class="btn btn-icon" id="deep-thinking-toggle" title="Enable deep thinking">
-                            <i class="bi bi-book"></i>
-                        </button>
-                        <button class="btn btn-send" type="submit">
-                            <i class="bi bi-send"></i>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
-
-        <!-- Copyright Footer -->
-        <footer class="text-center py-3 text-muted">
-            <small>&copy; 2025 AI Assistant. All rights reserved.</small>
-        </footer>
     </div>
 
     <script src="chat.js"></script>

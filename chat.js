@@ -1,216 +1,238 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const chatForm = document.getElementById('chat-form');
-    const messageInput = document.getElementById('message-input');
-    const fileInput = document.getElementById('file-input');
-    const chatMessages = document.getElementById('chat-messages');
-    const typingIndicator = document.getElementById('typing-indicator');
-    const navToggle = document.getElementById('nav-toggle');
-    const closeNav = document.getElementById('close-nav');
-    const sidenav = document.getElementById('sidenav');
-    const themeToggle = document.getElementById('theme-toggle');
-    const clearHistory = document.getElementById('clear-history');
-    const html = document.documentElement;
+class ChatInterface {
+    constructor() {
+        this.apiKey = 'AIzaSyC2WIamM5a3OdUUcdLp2ATmUZEmMqBhS5c';
+        this.API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.apiKey}`;
 
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'overlay';
-    document.body.appendChild(overlay);
+        this.elements = {
+            chatForm: document.getElementById('chatForm'),
+            userInput: document.getElementById('userInput'),
+            chatMessages: document.getElementById('chatMessages'),
+            fileInput: document.getElementById('fileInput'),
+            deepThinkButton: document.getElementById('deepThinkButton')
+        };
 
-    // Initialize theme
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    html.setAttribute('data-bs-theme', currentTheme);
-    themeToggle.checked = currentTheme === 'dark';
-
-    // Configure marked.js
-    marked.setOptions({
-        breaks: true,
-        gfm: true
-    });
-
-    // Theme toggle
-    themeToggle.addEventListener('change', () => {
-        const newTheme = themeToggle.checked ? 'dark' : 'light';
-        html.setAttribute('data-bs-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-    });
-
-    // Navigation toggle
-    function toggleNav() {
-        sidenav.classList.toggle('active');
-        overlay.classList.toggle('active');
+        this.isDeepThinking = false;
+        this.initialize();
+        this.setupExamplePrompts();
     }
 
-    navToggle.addEventListener('click', toggleNav);
-    closeNav.addEventListener('click', toggleNav);
-    overlay.addEventListener('click', toggleNav);
-
-    // Clear chat history
-    clearHistory.addEventListener('click', () => {
-        chatMessages.innerHTML = `
-            <div class="message bot">
-                <div class="message-content">
-                    Hello! I'm an AI assistant. How can I help you today? 💡
-                </div>
-            </div>
-        `;
-        toggleNav();
-    });
-
-    const deepThinkingToggle = document.getElementById('deep-thinking-toggle');
-    let isDeepThinkingEnabled = localStorage.getItem('deepThinking') === 'true';
-
-    deepThinkingToggle.classList.toggle('active', isDeepThinkingEnabled);
-
-    deepThinkingToggle.addEventListener('click', () => {
-        isDeepThinkingEnabled = !isDeepThinkingEnabled;
-        deepThinkingToggle.classList.toggle('active', isDeepThinkingEnabled);
-        localStorage.setItem('deepThinking', isDeepThinkingEnabled);
-    });
-
-    function formatMessage(content) {
-        if (content instanceof File) {
-            return `📎 ${content.name} (${(content.size / 1024).toFixed(2)} KB)`;
-        } else if (content.startsWith('data:image')) {
-            return `<img src="${content}" alt="Generated Image" style="max-width:100%;border-radius:0.5rem;">`;
-        } else {
-            // Process numbered lists to add line breaks
-            content = content.replace(/(\d+\.\s)/g, '\n$1');
-            
-            // Custom renderer for code blocks
-            const renderer = new marked.Renderer();
-            renderer.code = function(code, language) {
-                return `
-                    <div class="code-block">
-                        <div class="code-header">
-                            <span class="code-language">${language || 'code'}</span>
-                            <button class="copy-btn" onclick="copyCode(this)">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
-                        </div>
-                        <pre><code>${code}</code></pre>
-                    </div>`;
-            };
-            
-            marked.setOptions({ renderer });
-            return marked.parse(content);
-        }
-    }
-
-    function copyCode(button) {
-        const codeBlock = button.closest('.code-block').querySelector('code');
-        const text = codeBlock.textContent;
-        
-        navigator.clipboard.writeText(text).then(() => {
-            const icon = button.querySelector('i');
-            icon.classList.remove('bi-clipboard');
-            icon.classList.add('bi-clipboard-check');
-            
-            setTimeout(() => {
-                icon.classList.remove('bi-clipboard-check');
-                icon.classList.add('bi-clipboard');
-            }, 2000);
+    setupExamplePrompts() {
+        document.querySelectorAll('.welcome-message li').forEach(li => {
+            li.addEventListener('click', () => {
+                const promptText = li.textContent.replace(/^"(.+)"$/, '$1');
+                this.elements.userInput.value = promptText;
+                this.elements.userInput.focus();
+            });
         });
     }
 
-    function addMessage(content, isUser = false, isError = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-        messageDiv.style.animation = 'slideIn 0.3s ease';
+    initialize() {
+        this.elements.userInput.disabled = false;
+        this.elements.userInput.placeholder = "Type your message...";
+        this.elements.chatForm.querySelector('button[type="submit"]').disabled = false;
 
-        const messageContent = document.createElement('div');
-        messageContent.className = `message-content ${isError ? 'error' : ''}`;
-        messageContent.innerHTML = formatMessage(content);
-
-        messageDiv.appendChild(messageContent);
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showTypingIndicator() {
-        typingIndicator.classList.remove('d-none');
-        const deepThinkingIndicator = typingIndicator.querySelector('.deep-thinking');
-        if (isDeepThinkingEnabled) {
-            deepThinkingIndicator.classList.remove('d-none');
-        } else {
-            deepThinkingIndicator.classList.add('d-none');
+        // Keep welcome message visible
+        if (!this.elements.chatMessages.querySelector('.message')) {
+            this.elements.chatMessages.innerHTML = `
+                <div class="welcome-message text-center p-4">
+                    <h2>Welcome to spovaAI Chat</h2>
+                    <p>Try these example prompts:</p>
+                    <ul class="list-unstyled">
+                        <li>"Tell me about artificial intelligence"</li>
+                        <li>"How does photosynthesis work?"</li>
+                        <li>"Write a short story about space exploration"</li>
+                        <li>"Explain quantum computing in simple terms"</li>
+                    </ul>
+                    <p class="mt-3"><small>Use the deep thinking mode <i class="fa fa-book"></i> for more detailed responses</small></p>
+                </div>`;
         }
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Set up event listeners
+        this.elements.chatForm.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.elements.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+        this.elements.deepThinkButton.addEventListener('click', () => this.toggleDeepThinking());
+
+        // Load marked.js for markdown support
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        document.head.appendChild(script);
     }
 
-    function hideTypingIndicator() {
-        typingIndicator.classList.add('d-none');
+    toggleDeepThinking() {
+        this.isDeepThinking = !this.isDeepThinking;
+        this.elements.deepThinkButton.classList.toggle('active');
+        this.elements.deepThinkButton.innerHTML = this.isDeepThinking ? 
+            '<i class="fa fa-book"></i>fakyu' : 
+            '<i class="fa fa-book"></i>';
     }
 
-    function handleError(error) {
-        hideTypingIndicator();
-        const errorMessage = error.response?.error || error.message || 'Sorry, an error occurred. Please try again.';
-        addMessage(errorMessage, false, true);
-        console.error('Error:', error);
-    }
-
-    fileInput.addEventListener('change', function(e) {
-        const files = Array.from(e.target.files || []);
-        files.forEach(file => addMessage(file, true));
-
-        const formData = new FormData();
-        files.forEach(file => formData.append('files[]', file));
-
-        showTypingIndicator();
-
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            hideTypingIndicator();
-            data.responses.forEach(response => addMessage(response));
-        })
-        .catch(handleError);
-
-        fileInput.value = '';
-    });
-
-    chatForm.addEventListener('submit', async function(e) {
+    async handleSubmit(e) {
         e.preventDefault();
+        const userInput = this.elements.userInput.value.trim();
+        if (!userInput) return;
 
-        const message = messageInput.value.trim();
-        if (!message) return;
+        // Add user message
+        this.addMessage(userInput, 'user');
+        this.elements.userInput.value = '';
 
-        addMessage(message, true);
-        messageInput.value = '';
-        showTypingIndicator();
+        // Show typing indicator
+        this.showTypingIndicator();
 
         try {
-            const isImagePrompt = message.toLowerCase().startsWith('/imagine');
-            const endpoint = isImagePrompt ? '/generate-image' : '/chat';
+            // Add deep thinking delay if enabled
+            if (this.isDeepThinking) {
+                await new Promise(resolve => setTimeout(resolve, 3000));
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
 
-            const response = await fetch(endpoint, {
+            const response = await fetch(this.API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    message: message,
-                    deepThinking: isDeepThinkingEnabled
-                })
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: this.isDeepThinking ? 
+                                `Please provide a detailed, comprehensive response with multiple perspectives and examples. Consider the following request carefully: ${userInput}` :
+                                userInput,
+                        }],
+                    }],
+                }),
             });
 
             const data = await response.json();
+            console.log('API Response:', data);
 
             if (!response.ok) {
-                throw { response: data, status: response.status };
+                throw new Error(data.error?.message || 'Failed to get response from spovaAI API');
             }
 
-            hideTypingIndicator();
-            if (isImagePrompt) {
-                addMessage(data.image_url, false);
-            } else {
-                addMessage(data.response, false);
-            }
+            // Get bot response
+            const botResponse = data.candidates[0].content.parts[0].text;
 
+            // Remove typing indicator and add AI response
+            this.removeTypingIndicator();
+            this.addMessage(botResponse, 'ai');
         } catch (error) {
-            handleError(error);
+            console.error('spovi API error:', error);
+            this.removeTypingIndicator();
+            this.showError("Failed to get response from spovaAI. Error: " + error.message);
         }
-    });
+    }
+
+    async handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            // For now, just append the filename to the input
+            const filename = file.name;
+            this.elements.userInput.value += `\nAttached file: ${filename}`;
+
+            // Reset file input
+            this.elements.fileInput.value = '';
+        } catch (error) {
+            console.error('File upload error:', error);
+            this.showError("Failed to upload file: " + error.message);
+        }
+    }
+
+    addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message-${sender}`;
+
+        if (sender === 'ai') {
+            const avatar = document.createElement('div');
+            avatar.className = 'bot-avatar';
+            messageDiv.appendChild(avatar);
+        }
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+
+        if (window.marked && sender === 'ai') {
+            const parsed = marked.parse(text);
+            contentDiv.innerHTML = parsed.replace(/<pre><code class="language-(\w+)">([\s\S]+?)<\/code><\/pre>/g, 
+                (_, lang, code) => {
+                    const lines = code.split('\n').map(line => `<span>${line}</span>`).join('\n');
+                    return `
+                        <pre>
+                            <div class="code-header">${lang}</div>
+                            <button class="copy-btn">Copy</button>
+                            <code class="language-${lang}">${lines}</code>
+                        </pre>`;
+                }
+            );
+
+            // Add copy button for code blocks
+            contentDiv.querySelectorAll('pre').forEach(pre => {
+                const copyBtn = pre.querySelector('.copy-btn');
+                copyBtn.addEventListener('click', () => {
+                    const code = pre.querySelector('code').textContent;
+                    navigator.clipboard.writeText(code);
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+                });
+            });
+        } else {
+            contentDiv.textContent = text;
+        }
+
+        // Add copy button for entire message
+        const copyMessageBtn = document.createElement('button');
+        copyMessageBtn.className = 'message-copy-btn';
+        copyMessageBtn.textContent = 'Copy';
+        copyMessageBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(text);
+            copyMessageBtn.textContent = 'Copied!';
+            setTimeout(() => copyMessageBtn.textContent = 'Copy', 2000);
+        });
+        messageDiv.appendChild(copyMessageBtn);
+
+        messageDiv.appendChild(contentDiv);
+        this.elements.chatMessages.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+
+    showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'typing-indicator message-ai';
+        indicator.innerHTML = `
+            <div class="bot-avatar"></div>
+            <div class="message-content">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        `;
+        this.elements.chatMessages.appendChild(indicator);
+        this.scrollToBottom();
+    }
+
+    removeTypingIndicator() {
+        const indicator = this.elements.chatMessages.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        this.elements.chatMessages.appendChild(errorDiv);
+        this.scrollToBottom();
+    }
+
+    scrollToBottom() {
+        this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
+    }
+}
+
+// Initialize chat interface when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ChatInterface();
 });
+
