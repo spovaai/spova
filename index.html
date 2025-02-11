@@ -6,7 +6,7 @@
     <title>Login</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="qwe.css">
 </head>
 <body class="dark">
     <div class="container">
@@ -15,7 +15,7 @@
                 <div class="card shadow">
                     <div class="card-body p-5">
                         <h2 class="text-center mb-4 animated-header">Login</h2>
-                        <form method="POST" action="{{ url_for('auth.login') }}">
+                        <form method="POST" action="dashboard.html">
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
                                 <div class="input-group">
@@ -47,7 +47,7 @@
                             {% endwith %}
                         </form>
                         <p class="text-center mt-3">
-                            Don't have an account? <a href="spova/signup.html">Sign up</a>
+                            Don't have an account? <a href="signup.html">Sign up</a>
                         </p>
                     </div>
                 </div>
