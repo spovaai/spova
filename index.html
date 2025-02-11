@@ -3,56 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="qwe.css">
+    <title>spovaAI Chat Interface</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <!-- Add marked.js for markdown support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body class="dark">
-    <div class="container">
-        <div class="row justify-content-center min-vh-100 align-items-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow">
-                    <div class="card-body p-5">
-                        <h2 class="text-center mb-4 animated-header">Login</h2>
-                        <form method="POST" action="dashboard.html">
-                            {{ form.hidden_tag() }}
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <i class="fas fa-envelope input-icon"></i>
-                                    {{ form.email(class="form-control", placeholder="Email") }}
+<body>
+
+    <!-- Button to toggle the navigation -->
+<button id="nav-toggle" class="nav-toggle">☰</button>
+
+<!-- Side Navigation -->
+<div id="sidenav" class="sidenav">
+    <button id="close-nav" class="close-btn">×</button>
+    <ul>
+        <li><a href="#" id="option-1">Option 1</a></li>
+        <li><a href="#" id="option-2">Option 2</a></li>
+        <li><a href="#" id="option-3">Option 3</a></li>
+    </ul>
+</div>
+    
+    <div class="container-fluid h-100">
+        <div class="header py-3 border-bottom">
+            <div class="container">
+                <div class="d-flex justify-content-center align-items-center">
+                    <img src="https://i.ibb.co.com/1fFqV117/1739184514-picsay.png" alt="spovaAI Chat Logo" height="40">
+                </div>
+            </div>
+        </div>
+        <div class="row h-100 pt-4">
+            <div class="col-12">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="welcome-message text-center p-4">
+                            <h2>Welcome to Gemini Chat</h2>
+                            <p>Try these example prompts:</p>
+                            <ul class="list-unstyled">
+                                <li>"Tell me about artificial intelligence"</li>
+                                <li>"How does photosynthesis work?"</li>
+                                <li>"Write a short story about space exploration"</li>
+                                <li>"Explain quantum computing in simple terms"</li>
+                            </ul>
+                            <p class="mt-3"><small>Use the deep thinking mode <i class="fa fa-book"></i> for more detailed responses</small></p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input">
+                        <form id="chatForm">
+                            <div class="input-container">
+                                <div class="button-group">
+                                    <label class="action-btn" for="fileInput" title="Attach file">
+                                        <i class="fa fa-paperclip"></i>
+                                        <input type="file" id="fileInput" class="d-none">
+                                    </label>
+                                    <button type="button" class="action-btn" id="deepThinkButton" title="Deep thinking mode">
+                                        <i class="fa fa-book"></i>
+                                    </button>
                                 </div>
-                                {% for error in form.email.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
+                                <textarea class="form-control" id="userInput" rows="3" placeholder="Type your message..."></textarea>
+                                <button class="send-btn" type="submit">
+                                    <i class="fa fa-paper-plane"></i>
+                                </button>
                             </div>
-                            <div class="mb-3">
-                                <div class="input-group">
-                                    <i class="fas fa-lock input-icon"></i>
-                                    {{ form.password(class="form-control", placeholder="Password") }}
-                                </div>
-                                {% for error in form.password.errors %}
-                                <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <span class="btn-text">Login</span>
-                            </button>
-                            {% with messages = get_flashed_messages(with_categories=true) %}
-                                {% if messages %}
-                                    {% for category, message in messages %}
-                                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                                    {% endfor %}
-                                {% endif %}
-                            {% endwith %}
                         </form>
-                        <p class="text-center mt-3">
-                            Don't have an account? <a href="signup.html">Sign up</a>
-                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="chat.js"></script>
 </body>
 </html>
