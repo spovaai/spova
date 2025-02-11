@@ -159,36 +159,9 @@ class ChatInterface {
         this.showTypingIndicator(this.isDeepThinking);
 
         try {
-            // First, query the knowledge base
-            const knowledgeResponse = await fetch('/query_knowledge', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query: userInput }),
-            });
-
-            const knowledgeData = await knowledgeResponse.json();
-            let finalPrompt = userInput;
-
-            if (knowledgeData.found) {
-                // Add 1.5 second delay for database responses
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                finalPrompt = `Based on this context: "${knowledgeData.content}", please answer: ${userInput}`;
-            }
-
-            // Check for specific question
-            if (userInput.toLowerCase() === "who are u") {
-                this.removeTypingIndicator();
-                this.addMessage("I am spovaAI, your intelligent chat assistant that helps you with various tasks and questions.", 'ai');
-                return;
-            }
-
-            // Check for questions about Raffael
-            if (userInput.toLowerCase().includes("raffael")) {
-                this.removeTypingIndicator();
-                this.addMessage("Raffael is the most handsome person! And Tosha is a very pretty girlfriend - she's wonderful, caring, and makes Raffael's life brighter every day!", 'ai');
-                return;
+            // Add deep thinking delay if enabled
+            if (this.isDeepThinking) {
+                await new Promise(resolve => setTimeout(resolve, 3000));
             }
 
             const response = await fetch(this.API_URL, {
@@ -200,8 +173,8 @@ class ChatInterface {
                     contents: [{
                         parts: [{
                             text: this.isDeepThinking ?
-                                `Please provide a detailed, comprehensive response with multiple perspectives and examples. Consider the following request carefully, minimum answer 300 words: ${finalPrompt}` :
-                                finalPrompt,
+                                `Please provide a detailed, comprehensive response with multiple perspectives and examples. Consider the following request carefully: ${userInput}` :
+                                userInput,
                         }],
                     }],
                 }),
@@ -216,7 +189,7 @@ class ChatInterface {
             const botResponse = data.candidates[0].content.parts[0].text;
 
             this.removeTypingIndicator();
-            this.addMessage(botResponse, 'ai');
+            this.addMessage(botResponse, 'ai', startTime);
         } catch (error) {
             console.error('API error:', error);
             this.removeTypingIndicator();
