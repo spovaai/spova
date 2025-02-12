@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Social login handler
     window.handleSocialLogin = (provider) => {
         showNotification(`Logging in with ${provider}... (Demo)`, 'success');
-        // In a real application, this would redirect to the OAuth provider
         setTimeout(() => {
             window.location.href = 'dashboard.html';
         }, 1500);
@@ -22,30 +21,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signupForm');
     const toast = new bootstrap.Toast(document.getElementById('authToast'));
 
-    // Mock user data
-    const users = [
-        { email: 'user@example.com', password: 'password123' }
-    ];
-
-    // Password visibility toggle
+    // Toggle password visibility
     document.querySelectorAll('.toggle-password').forEach(button => {
         button.addEventListener('click', () => {
             const input = button.closest('.password-field').querySelector('input');
             const icon = button.querySelector('i');
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         });
     });
 
-    // Password strength indicator
+    // Check password strength
     const checkPasswordStrength = (password) => {
         const strengthIndicator = document.querySelector('.password-strength');
         if (!password) {
@@ -84,16 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.show();
     };
 
-    // Form loading state
+    // Set loading state for forms
     const setLoading = (form, isLoading) => {
         const button = form.querySelector('button[type="submit"]');
-        if (isLoading) {
-            button.classList.add('loading');
-            button.disabled = true;
-        } else {
-            button.classList.remove('loading');
-            button.disabled = false;
-        }
+        button.classList.toggle('loading', isLoading);
+        button.disabled = isLoading;
     };
 
     // Form validation
@@ -125,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(loginForm, true);
 
-        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
 
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         const user = users.find(u => u.email === email && u.password === password);
 
         setLoading(loginForm, false);
@@ -165,25 +148,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(signupForm, true);
 
-        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const userExists = users.some(u => u.email === email);
+        const users = JSON.parse(localStorage.getItem('users')) || [];
 
-        setLoading(signupForm, false);
-
-        if (userExists) {
+        if (users.some(u => u.email === email)) {
+            setLoading(signupForm, false);
             showNotification('User already exists', 'error');
             return;
         }
 
         users.push({ email, password });
+        localStorage.setItem('users', JSON.stringify(users));
         localStorage.setItem('currentUser', JSON.stringify({ email, password }));
+
+        setLoading(signupForm, false);
         showNotification('Account created successfully! Redirecting...');
         setTimeout(() => window.location.href = 'dashboard.html', 1500);
     });
 
-    // Real-time validation
+    // Logout functionality
+    document.getElementById('logoutButton')?.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        showNotification('Logged out successfully');
+        setTimeout(() => window.location.href = 'login.html', 1000);
+    });
+
+    // Real-time input validation
     document.querySelectorAll('input').forEach(input => {
         input.addEventListener('input', () => {
             if (input.checkValidity()) {
