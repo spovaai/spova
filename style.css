@@ -483,8 +483,8 @@ textarea.form-control {
 .processing-time {
     color: var(--bs-secondary);
     font-size: 0.7rem;
-    margin-bottom: 8px;
-    text-align: center;
+    margin-bottom: 4px;
+    text-align: left;
 }
 
 .dot {
