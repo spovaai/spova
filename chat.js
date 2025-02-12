@@ -1,3 +1,52 @@
+// User management class
+class UserManager {
+    constructor() {
+        this.users = JSON.parse(localStorage.getItem('users') || '[]');
+        this.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    }
+
+    saveUsers() {
+        localStorage.setItem('users', JSON.stringify(this.users));
+    }
+
+    setCurrentUser(user) {
+        this.currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+
+    logout() {
+        this.currentUser = null;
+        localStorage.removeItem('currentUser');
+    }
+
+    findUser(email) {
+        return this.users.find(user => user.email === email);
+    }
+
+    createUser(username, email, password) {
+        if (this.findUser(email)) {
+            throw new Error('Email already exists');
+        }
+
+        const user = {
+            id: Date.now(),
+            username,
+            email,
+            password // In a real app, this should be hashed
+        };
+
+        this.users.push(user);
+        this.saveUsers();
+        return user;
+    }
+
+    validatePassword(password) {
+        return password.length >= 8 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password);
+    }
+}
+
+const userManager = new UserManager();
+
 class ChatInterface {
     constructor() {
         this.apiKey = 'AIzaSyC2WIamM5a3OdUUcdLp2ATmUZEmMqBhS5c';
@@ -10,13 +59,97 @@ class ChatInterface {
             deepThinkButton: document.getElementById('deepThinkButton'),
             fileInput: document.getElementById('fileInput'),
             navToggle: document.getElementById('nav-toggle'),
-            navMenu: document.getElementById('nav-menu')
+            navMenu: document.getElementById('nav-menu'),
+            loginForm: document.getElementById('loginForm'),
+            signupForm: document.getElementById('signupForm')
         };
 
         this.isDeepThinking = false;
         this.initialize();
         this.setupExamplePrompts();
         this.setupNavigation();
+        this.setupAuthForms();
+    }
+
+    setupAuthForms() {
+        if (this.elements.loginForm) {
+            this.elements.loginForm.addEventListener('submit', this.handleLogin.bind(this));
+        }
+
+        if (this.elements.signupForm) {
+            this.elements.signupForm.addEventListener('submit', this.handleSignup.bind(this));
+        }
+
+        // Redirect if already logged in
+        if (userManager.currentUser) {
+            window.location.href = '/dashboard';
+        }
+    }
+
+    async handleLogin(e) {
+        e.preventDefault();
+        const form = e.target;
+        const email = form.querySelector('#email').value;
+        const password = form.querySelector('#password').value;
+        const errorDiv = document.getElementById('loginError');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const spinner = submitBtn.querySelector('.spinner-border');
+
+        try {
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            errorDiv.classList.add('d-none');
+
+            const user = userManager.findUser(email);
+            if (!user || user.password !== password) {
+                throw new Error('Invalid email or password');
+            }
+
+            userManager.setCurrentUser(user);
+            window.location.href = '/dashboard';
+        } catch (error) {
+            errorDiv.textContent = error.message;
+            errorDiv.classList.remove('d-none');
+        } finally {
+            submitBtn.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    }
+
+    async handleSignup(e) {
+        e.preventDefault();
+        const form = e.target;
+        const username = form.querySelector('#username').value;
+        const email = form.querySelector('#email').value;
+        const password = form.querySelector('#password').value;
+        const confirmPassword = form.querySelector('#confirmPassword').value;
+        const errorDiv = document.getElementById('signupError');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const spinner = submitBtn.querySelector('.spinner-border');
+
+        try {
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            errorDiv.classList.add('d-none');
+
+            if (!userManager.validatePassword(password)) {
+                throw new Error('Password must be at least 8 characters and contain numbers and letters');
+            }
+
+            if (password !== confirmPassword) {
+                throw new Error('Passwords do not match');
+            }
+
+            const user = userManager.createUser(username, email, password);
+            userManager.setCurrentUser(user);
+            window.location.href = '/dashboard';
+        } catch (error) {
+            errorDiv.textContent = error.message;
+            errorDiv.classList.remove('d-none');
+        } finally {
+            submitBtn.disabled = false;
+            spinner.classList.add('d-none');
+        }
     }
 
     setupNavigation() {
