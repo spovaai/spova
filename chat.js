@@ -239,9 +239,6 @@ if (sender === 'ai' && startTime) {
     const processingTime = document.createElement('div');
     processingTime.className = 'processing-time';
     processingTime.textContent = `Processing time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`;
-
-    // Tempatkan processing time di atas kiri bot message
-    contentDiv.prepend(processingTime);
 }
 
         if (sender === 'ai') {
