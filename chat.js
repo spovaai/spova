@@ -271,17 +271,6 @@ class ChatInterface {
             contentDiv.textContent = content;
         }
 
-    addMessage(content, sender, startTime = null) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message message-${sender}`;
-
-        if (sender === 'ai' && startTime && this.isDeepThinking) {
-            const processingTime = document.createElement('div');
-            processingTime.className = 'processing-time';
-            processingTime.textContent = `Processing time: ${((Date.now() - startTime) / 1000).toFixed(1)}s`;
-            messageDiv.appendChild(processingTime);
-        }
-
         // Add copy button for entire message
         if (sender === 'ai') {
             const copyMessageBtn = document.createElement('button');
