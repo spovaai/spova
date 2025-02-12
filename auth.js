@@ -1,236 +1,194 @@
-// User management class
-class UserManager {
-    constructor() {
-        this.users = JSON.parse(localStorage.getItem('users') || '[]');
-        this.currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    }
-
-    saveUsers() {
-        localStorage.setItem('users', JSON.stringify(this.users));
-    }
-
-    setCurrentUser(user) {
-        this.currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
-    }
-
-    logout() {
-        this.currentUser = null;
-        localStorage.removeItem('currentUser');
-    }
-
-    findUser(email) {
-        return this.users.find(user => user.email === email);
-    }
-
-    createUser(username, email, password) {
-        if (this.findUser(email)) {
-            throw new Error('Email already exists');
-        }
-
-        const user = {
-            id: Date.now(),
-            username,
-            email,
-            password // In a real app, this should be hashed
-        };
-
-        this.users.push(user);
-        this.saveUsers();
-        return user;
-    }
-
-    validatePassword(password) {
-        return password.length >= 8 && /[0-9]/.test(password) && /[a-zA-Z]/.test(password);
-    }
-}
-
-const userManager = new UserManager();
-
-// Form handling
 document.addEventListener('DOMContentLoaded', () => {
+    // Show loading screen for 2 seconds then fade out
+    setTimeout(() => {
+        document.querySelector('.loading-screen').style.opacity = '0';
+        document.querySelector('.loading-screen').style.transition = 'opacity 0.5s ease';
+        document.querySelector('.auth-card').style.display = 'block';
+        setTimeout(() => {
+            document.querySelector('.loading-screen').style.display = 'none';
+        }, 500);
+    }, 2000);
+
+    // Social login handler
+    window.handleSocialLogin = (provider) => {
+        showNotification(`Logging in with ${provider}... (Demo)`, 'success');
+        // In a real application, this would redirect to the OAuth provider
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500);
+    };
+
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
+    const toast = new bootstrap.Toast(document.getElementById('authToast'));
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
+    // Mock user data
+    const users = [
+        { email: 'user@example.com', password: 'password123' }
+    ];
 
-    if (signupForm) {
-        signupForm.addEventListener('submit', handleSignup);
-    }
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', () => {
+            const input = button.closest('.password-field').querySelector('input');
+            const icon = button.querySelector('i');
 
-    // Redirect if already logged in
-    if (userManager.currentUser) {
-        window.location.href = '/dashboard';
-    }
-});
-
-async function handleLogin(e) {
-    e.preventDefault();
-    const form = e.target;
-    const email = form.querySelector('#email').value;
-    const password = form.querySelector('#password').value;
-    const errorDiv = document.getElementById('loginError');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const spinner = submitBtn.querySelector('.spinner-border');
-
-    try {
-        submitBtn.disabled = true;
-        spinner.classList.remove('d-none');
-        errorDiv.classList.add('d-none');
-
-        const user = userManager.findUser(email);
-        if (!user || user.password !== password) {
-            throw new Error('Invalid email or password');
-        }
-
-        userManager.setCurrentUser(user);
-        window.location.href = '/dashboard';
-    } catch (error) {
-        errorDiv.textContent = error.message;
-        errorDiv.classList.remove('d-none');
-    } finally {
-        submitBtn.disabled = false;
-        spinner.classList.add('d-none');
-    }
-}
-
-async function handleSignup(e) {
-    e.preventDefault();
-    const form = e.target;
-    const username = form.querySelector('#username').value;
-    const email = form.querySelector('#email').value;
-    const password = form.querySelector('#password').value;
-    const confirmPassword = form.querySelector('#confirmPassword').value;
-    const errorDiv = document.getElementById('signupError');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const spinner = submitBtn.querySelector('.spinner-border');
-
-    try {
-        submitBtn.disabled = true;
-        spinner.classList.remove('d-none');
-        errorDiv.classList.add('d-none');
-
-        if (!userManager.validatePassword(password)) {
-            throw new Error('Password must be at least 8 characters and contain numbers and letters');
-        }
-
-        if (password !== confirmPassword) {
-            throw new Error('Passwords do not match');
-        }
-
-        const user = userManager.createUser(username, email, password);
-        userManager.setCurrentUser(user);
-        window.location.href = '/dashboard';
-    } catch (error) {
-        errorDiv.textContent = error.message;
-        errorDiv.classList.remove('d-none');
-    } finally {
-        submitBtn.disabled = false;
-        spinner.classList.add('d-none');
-    }
-}
-// Theme toggle functionality
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.querySelector('body');
-    const toggle = document.querySelector('.toggle-input');
-    const part = document.getElementById('particles-js');
-
-    // Set initial theme based on system preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    toggle.checked = prefersDark;
-    updateTheme(prefersDark);
-
-    toggle.addEventListener('change', () => {
-        updateTheme(toggle.checked);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
     });
 
-    function updateTheme(isDark) {
-        if (isDark) {
-            container.className = 'dark';
-            part.style.backgroundColor = '#100b16';
-            particlesJS('particles-js', {
-                particles: {
-                    number: { value: 100, density: { enable: true, value_area: 800 } },
-                    color: { value: '#b392ac' },
-                    shape: { type: 'polygon', polygon: { nb_sides: 6 } },
-                    opacity: { value: 0.75 },
-                    size: { value: 2, anim: { enable: true, speed: 5, size_min: 1, sync: true } },
-                    line_linked: {
-                        enable: true,
-                        distance: 125,
-                        color: '#ffffff',
-                        opacity: 0.75,
-                        width: 0.5
-                    },
-                    move: {
-                        enable: true,
-                        speed: 5,
-                        direction: 'none',
-                        random: false,
-                        straight: false,
-                        out_mode: 'out',
-                        bounce: false,
-                        attract: { enable: true, rotateX: 1500, rotateY: 900 }
-                    }
-                },
-                interactivity: {
-                    detect_on: 'canvas',
-                    events: {
-                        onhover: { enable: true, mode: 'grab' },
-                        onclick: { enable: true, mode: 'bubble' },
-                        resize: true
-                    },
-                    modes: {
-                        grab: { distance: 300, line_linked: { opacity: 1 } },
-                        bubble: { distance: 300, size: 5, duration: 0.75, opacity: 8, speed: 3 }
-                    }
-                },
-                retina_detect: true
-            });
-        } else {
-            container.className = 'light';
-            part.style.backgroundColor = '#e8e1ef';
-            particlesJS('particles-js', {
-                particles: {
-                    number: { value: 100, density: { enable: true, value_area: 800 } },
-                    color: { value: '#7B2CBF' },
-                    shape: { type: 'circle' },
-                    opacity: { value: 0.75 },
-                    size: { value: 2, anim: { enable: true, speed: 5, size_min: 1, sync: true } },
-                    line_linked: {
-                        enable: true,
-                        distance: 125,
-                        color: '#7B2CBF',
-                        opacity: 0.75,
-                        width: 0.5
-                    },
-                    move: {
-                        enable: true,
-                        speed: 5,
-                        direction: 'none',
-                        random: false,
-                        straight: false,
-                        out_mode: 'out',
-                        bounce: false,
-                        attract: { enable: true, rotateX: 1500, rotateY: 900 }
-                    }
-                },
-                interactivity: {
-                    detect_on: 'canvas',
-                    events: {
-                        onhover: { enable: true, mode: 'grab' },
-                        onclick: { enable: true, mode: 'bubble' },
-                        resize: true
-                    },
-                    modes: {
-                        grab: { distance: 300, line_linked: { opacity: 1 } },
-                        bubble: { distance: 300, size: 5, duration: 0.75, opacity: 8, speed: 3 }
-                    }
-                },
-                retina_detect: true
-            });
+    // Password strength indicator
+    const checkPasswordStrength = (password) => {
+        const strengthIndicator = document.querySelector('.password-strength');
+        if (!password) {
+            strengthIndicator.removeAttribute('data-strength');
+            return;
         }
-    }
+
+        const hasLower = /[a-z]/.test(password);
+        const hasUpper = /[A-Z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecial = /[!@#$%^&*]/.test(password);
+        const length = password.length;
+
+        const score = [hasLower, hasUpper, hasNumber, hasSpecial]
+            .filter(Boolean).length;
+
+        if (length < 8 || score < 2) {
+            strengthIndicator.setAttribute('data-strength', 'weak');
+        } else if (length >= 8 && score === 2) {
+            strengthIndicator.setAttribute('data-strength', 'medium');
+        } else {
+            strengthIndicator.setAttribute('data-strength', 'strong');
+        }
+    };
+
+    document.getElementById('signupPassword').addEventListener('input', (e) => {
+        checkPasswordStrength(e.target.value);
+    });
+
+    // Show notification
+    const showNotification = (message, type = 'success') => {
+        const toastEl = document.getElementById('authToast');
+        toastEl.querySelector('.toast-body').textContent = message;
+        toastEl.classList.remove('success', 'error');
+        toastEl.classList.add(type);
+        toast.show();
+    };
+
+    // Form loading state
+    const setLoading = (form, isLoading) => {
+        const button = form.querySelector('button[type="submit"]');
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+        }
+    };
+
+    // Form validation
+    const validateForm = (form) => {
+        let isValid = true;
+        form.querySelectorAll('input').forEach(input => {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        return isValid;
+    };
+
+    // Login Form Submission
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!validateForm(loginForm)) {
+            loginForm.classList.add('shake');
+            setTimeout(() => loginForm.classList.remove('shake'), 500);
+            return;
+        }
+
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        setLoading(loginForm, true);
+
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const user = users.find(u => u.email === email && u.password === password);
+
+        setLoading(loginForm, false);
+
+        if (user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            showNotification('Login successful! Redirecting...');
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        } else {
+            showNotification('Invalid email or password', 'error');
+            loginForm.classList.add('shake');
+            setTimeout(() => loginForm.classList.remove('shake'), 500);
+        }
+    });
+
+    // Signup Form Submission
+    signupForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!validateForm(signupForm)) {
+            signupForm.classList.add('shake');
+            setTimeout(() => signupForm.classList.remove('shake'), 500);
+            return;
+        }
+
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            document.getElementById('confirmPassword').classList.add('is-invalid');
+            showNotification('Passwords do not match', 'error');
+            return;
+        }
+
+        setLoading(signupForm, true);
+
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const userExists = users.some(u => u.email === email);
+
+        setLoading(signupForm, false);
+
+        if (userExists) {
+            showNotification('User already exists', 'error');
+            return;
+        }
+
+        users.push({ email, password });
+        localStorage.setItem('currentUser', JSON.stringify({ email, password }));
+        showNotification('Account created successfully! Redirecting...');
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+    });
+
+    // Real-time validation
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => {
+            if (input.checkValidity()) {
+                input.classList.remove('is-invalid');
+            }
+        });
+    });
 });

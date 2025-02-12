@@ -1,0 +1,312 @@
+/* Add these styles at the beginning of the file */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bs-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    background: var(--bs-primary);
+    border-radius: 50%;
+    animation: glow 1.5s ease-in-out infinite;
+}
+
+.dot:nth-child(1) { animation-delay: 0s; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes glow {
+    0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.3;
+        box-shadow: 0 0 0 rgba(var(--bs-primary-rgb), 0);
+    }
+    50% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(var(--bs-primary-rgb), 0.5);
+    }
+}
+
+/* Update input styling */
+.modern-input {
+    border-radius: 30px !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(33, 37, 41, 0.8) !important;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    padding: 1.5rem 1rem !important;
+}
+
+.modern-input:focus {
+    border-color: var(--bs-primary) !important;
+    box-shadow: 0 0 15px rgba(var(--bs-primary-rgb), 0.2) !important;
+    transform: translateY(-2px);
+}
+
+.form-floating > .modern-input {
+    padding-top: 1.625rem !important;
+    padding-bottom: 0.625rem !important;
+}
+
+/* Social login buttons */
+.social-login {
+    margin-top: 1.5rem;
+}
+
+.social-btn {
+    border-radius: 30px;
+    padding: 0.8rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn i {
+    margin-right: 8px;
+}
+
+/* Keep existing styles below */
+:root {
+    --animation-duration: 0.3s;
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+    height: 100%;
+    background-color: var(--bs-dark);
+}
+
+.auth-card {
+    background: rgba(33, 37, 41, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform var(--animation-duration) var(--transition-timing);
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+}
+
+.brand-logo {
+    margin-bottom: 2rem;
+}
+
+.brand-logo i {
+    background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.nav-pills .nav-link {
+    border-radius: 10px;
+    padding: 0.8rem 1.5rem;
+    transition: all var(--animation-duration) var(--transition-timing);
+    color: var(--bs-secondary);
+}
+
+.nav-pills .nav-link.active {
+    background: var(--bs-primary);
+    transform: scale(1.05);
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    background: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+
+.form-floating {
+    position: relative;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(33, 37, 41, 0.8) !important;
+    backdrop-filter: blur(5px);
+    transition: all var(--animation-duration) var(--transition-timing);
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding-left: 2.5rem !important;
+}
+
+.form-control:focus::placeholder {
+    color: transparent;
+}
+
+.form-floating .form-control:focus + label {
+    opacity: 0;
+}
+
+.form-floating .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 4;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+    transform: translateY(-2px);
+}
+
+.password-field {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--bs-secondary);
+    opacity: 0.7;
+    transition: all var(--animation-duration) var(--transition-timing);
+    z-index: 4;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+    color: var(--bs-primary);
+}
+
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 8px;
+    transition: all var(--animation-duration) var(--transition-timing);
+}
+
+.password-strength[data-strength="weak"] {
+    background: var(--bs-danger);
+    width: 33%;
+}
+
+.password-strength[data-strength="medium"] {
+    background: var(--bs-warning);
+    width: 66%;
+}
+
+.password-strength[data-strength="strong"] {
+    background: var(--bs-success);
+    width: 100%;
+}
+
+.btn-primary {
+    border-radius: 12px;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--animation-duration) var(--transition-timing);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.2);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.btn.loading .btn-text {
+    opacity: 0;
+}
+
+.btn.loading .btn-spinner {
+    display: block;
+}
+
+.toast {
+    background: rgba(33, 37, 41, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.toast.success {
+    border-left: 4px solid var(--bs-success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--bs-danger);
+}
+
+.toast-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+    .auth-card {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+/* Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.invalid-feedback {
+    font-size: 0.875rem;
+    color: var(--bs-danger);
+    margin-top: 0.25rem;
+    position: absolute;
+    bottom: -1.5rem;
+    left: 0;
+}
+
+.form-control.is-invalid {
+    border-color: var(--bs-danger) !important;
+    background-image: none !important;
+}
+
+.form-floating {
+    margin-bottom: 1.5rem;
+}

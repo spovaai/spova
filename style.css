@@ -552,3 +552,39 @@ textarea.form-control {
         transform: translateY(0);
     }
 }
+
+.card {
+    border: 1px solid var(--bs-secondary);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.nav-tabs .nav-link {
+    color: var(--bs-secondary);
+    border: none;
+    border-radius: 12px;
+    margin-right: 0.5rem;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    border: none;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border: none;
+    border-radius: 12px;
+    padding: 0.8rem;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.9);
+}

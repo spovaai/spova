@@ -53,13 +53,13 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="user-info">
-                            <span class="email">{{ current_user.email }}</span>
-                            <a href="{{ url_for('auth.logout') }}" id="option-3" class="menu-item">
-                                <i class="fa fa-sign-out"></i>
-                                <span>Logout</span>
-                            </a>
-                        </div>
+<div class="user-info">
+    <span class="email" id="userEmail"></span>
+    <a href="#" id="option-3" class="menu-item" onclick="logout()">
+        <i class="fa fa-sign-out"></i>
+        <span>Logout</span>
+    </a>
+</div>
                     </div>
                 </div>
             </div>
@@ -110,5 +110,20 @@
         </div>
     </div>
     <script src="chat.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (user) {
+            document.getElementById('userEmail').textContent = user.email;
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    function logout() {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
+    }
+    </script>
 </body>
 </html>
