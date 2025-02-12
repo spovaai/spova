@@ -2,43 +2,76 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>spovaAI Chat Interface</title>
     <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
-    <!-- Add marked.js for markdown support -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-
-    <!-- Button to toggle the navigation -->
-<button id="nav-toggle" class="nav-toggle">☰</button>
-
-<!-- Side Navigation -->
-<div id="sidenav" class="sidenav">
-    <button id="close-nav" class="close-btn">×</button>
-    <ul>
-        <li><a href="#" id="option-1">Option 1</a></li>
-        <li><a href="#" id="option-2">Option 2</a></li>
-        <li><a href="#" id="option-3">Option 3</a></li>
-    </ul>
-</div>
-    
     <div class="container-fluid h-100">
-        <div class="header py-3 border-bottom">
-            <div class="container">
-                <div class="d-flex justify-content-center align-items-center">
+        <div class="header py-2 border-bottom">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="logo-container">
                     <img src="https://i.ibb.co.com/1fFqV117/1739184514-picsay.png" alt="spovaAI Chat Logo" height="40">
+                </div>
+                <div class="nav-container">
+                    <button id="nav-toggle" class="nav-toggle">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="dropdown-menu" id="nav-menu">
+                        <a href="#" id="option-1" class="menu-item">
+                            <i class="fa fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                        <div class="settings-container">
+                            <a href="#" id="option-2" class="menu-item settings-toggle">
+                                <i class="fa fa-cog"></i>
+                                <span>Settings</span>
+                                <i class="fa fa-chevron-right ms-auto"></i>
+                            </a>
+                            <div class="submenu" id="settings-submenu">
+                                <a href="#" class="menu-item">
+                                    <i class="fa fa-paint-brush"></i>
+                                    <span>Appearance</span>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <i class="fa fa-bell"></i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#" class="menu-item refresh-messages">
+                                    <i class="fa fa-refresh"></i>
+                                    <span>Refresh Messages</span>
+                                </a>
+                                <a href="#" class="menu-item">
+                                    <i class="fa fa-shield"></i>
+                                    <span>Privacy</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <span class="email">{{ current_user.email }}</span>
+                            <a href="{{ url_for('auth.logout') }}" id="option-3" class="menu-item">
+                                <i class="fa fa-sign-out"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="row h-100 pt-4">
+    </div>
+
+        <div class="row h-100">
             <div class="col-12">
                 <div class="chat-container">
                     <div class="chat-messages" id="chatMessages">
                         <div class="welcome-message text-center p-4">
-                            <h2>Welcome to Gemini Chat</h2>
+                            <h2>Welcome to spovaAI Chat</h2>
                             <p>Try these example prompts:</p>
                             <ul class="list-unstyled">
                                 <li>"Tell me about artificial intelligence"</li>
@@ -54,7 +87,7 @@
                         <form id="chatForm">
                             <div class="input-container">
                                 <div class="button-group">
-                                    <label class="action-btn" for="fileInput" title="Attach file">
+                                    <label class="action-btn" for="fileInput" title="Upload file">
                                         <i class="fa fa-paperclip"></i>
                                         <input type="file" id="fileInput" class="d-none">
                                     </label>
@@ -68,12 +101,14 @@
                                 </button>
                             </div>
                         </form>
+                        <div class="copyright text-center mt-2">
+                            <small>&copy; 2025 spovaAI. All rights reserved.</small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="chat.js"></script>
 </body>
 </html>
