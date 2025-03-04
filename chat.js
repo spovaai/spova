@@ -1,7 +1,7 @@
 class ChatInterface {
     constructor() {
         this.apiKey = 'AIzaSyC2WIamM5a3OdUUcdLp2ATmUZEmMqBhS5c';
-        this.API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.apiKey}`;
+        this.API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${this.apiKey}`;
 
         this.elements = {
             chatForm: document.getElementById('chatForm'),
