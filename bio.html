@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" class="light-mode">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile and Links</title>
+    <link rel="stylesheet" href="https://dl.dropboxusercontent.com/scl/fi/bxxthcsae99rjsrpratvo/personalhub.css?rlkey=ej3qsjhmr15l56ywie20bx98r&st=4bb4dgi8&dl=0">
+    <!-- Font Awesome for verified icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Particle.js library for background animation -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+</head>
+<body>
+    <!-- Background particles -->
+    <div id="particles-js"></div>
+    
+    <div class="theme-toggle">
+        <button id="theme-button">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Profile Section -->
+        <section class="profile">
+            <div class="profile-avatar">
+                <img src="https://dl.dropboxusercontent.com/scl/fi/7jas9l9t8f291joqqb5o6/1000089237.jpg?rlkey=mg5mzmtmpzk2l210woufg5pls&st=ppqtw3t8&dl=0" alt="Profile Avatar" class="avatar-img">
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name">SPOVA AI</h1>
+                <p class="profile-bio">Web Developer & Designer</p>
+                <p class="profile-description">Passionate about creating beautiful and functional websites. Always learning and exploring new technologies.</p>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <span class="stat-value">1</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">12.8K</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value">231.2K</span>
+                        <span class="stat-label">Like</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connections Section -->
+        <section class="connections">
+            <h2 class="section-title">My Connections</h2>
+            <div class="boxes-container">
+                <!-- Box 1 -->
+                <a href="https://spovaai.github.io/spova/" class="box" data-glow-color="#333" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/mwl69ngw90cpfjeu0vi0s/7bf0ecf8-65b2-459c-bce6-8a954d7d1685.png?rlkey=zfy328bggvbmrnvewfpgtlc01&st=rkxxz2fi&dl=0" alt="SPOVA Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                SPOVA AI Chatbot
+                                <span class="verified-badge">
+                                    <svg id="verified" width="16" height="16" viewBox="0 0 40 40">
+                                        <path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Z" fill="currentColor"/>
+                                        <path d="M27.413 14.319l2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="white"/>
+                                    </svg>
+                                </span>
+                            </h3>
+                            <p class="box-description">Website created by SPOVA AI to chat with bot</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Box 2 -->
+                <a href="https://colibrism.terla.pro/indonesia" class="box" data-glow-color="#0077b5" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/7jas9l9t8f291joqqb5o6/1000089237.jpg?rlkey=mg5mzmtmpzk2l210woufg5pls&st=p9redit4&dl=0" alt="colibrism Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                ColibriSM Social
+                                <span class="verified-badge">
+                                    <svg id="verified" width="16" height="16" viewBox="0 0 40 40">
+                                        <path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Z" fill="currentColor"/>
+                                        <path d="M27.413 14.319l2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="white"/>
+                                    </svg>
+                                </span>
+                            </h3>
+                            <p class="box-description">Our social media accounts on other platforms</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Box 3 -->
+                <a href="https://elaelo.com/kazakhstan" class="box" data-glow-color="#1da1f2" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/7jas9l9t8f291joqqb5o6/1000089237.jpg?rlkey=mg5mzmtmpzk2l210woufg5pls&st=p9redit4&dl=0" alt="elaelo Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                ElaElo Social
+                                <span class="verified-badge">
+                                    <svg id="verified" width="16" height="16" viewBox="0 0 40 40">
+                                        <path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Z" fill="currentColor"/>
+                                        <path d="M27.413 14.319l2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="white"/>
+                                    </svg>
+                                </span>
+                            </h3>
+                            <p class="box-description">Our social media accounts on other platforms</p>
+                        </div>
+                    </div>
+                </a>
+
+                
+                <!-- Box 5 -->
+                <a href="https://pixaze.github.io/testchat" class="box" data-glow-color="#1da1f2" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/r6bccxsru9jlko3rjbmls/image_fx-69.jpg?rlkey=44x7qsx4qxgd1nnpxt3act89l&st=k0szvbd8&dl=0" alt="pixaze Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                PIXAZE Social
+                                <span class="verified-badge">
+                                    <svg id="verified" width="16" height="16" viewBox="0 0 40 40">
+                                        <path d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v5.905h5.975L14.638 40l5.36-3.094L25.358 40l3.232-5.6h6.162v-6.01L40 25.359 36.905 20 40 14.641l-5.248-3.03v-6.46h-6.419L25.358 0l-5.36 3.094Z" fill="currentColor"/>
+                                        <path d="M27.413 14.319l2.254 2.287-11.43 11.5-6.835-6.93 2.244-2.258 4.587 4.581 9.18-9.18Z" fill="white"/>
+                                    </svg>
+                                </span>
+                            </h3>
+                            <p class="box-description">Website created by SPOVA AI to chat with all</p>
+                        </div>
+                    </div>
+                </a>
+                
+
+                
+                <!-- Box 4 -->
+                <a href="https://www.tiktok.com/@spova.ai" class="box" data-glow-color="#C13584" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/7jas9l9t8f291joqqb5o6/1000089237.jpg?rlkey=mg5mzmtmpzk2l210woufg5pls&st=p9redit4&dl=0" alt="tiktok Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                TikTok Social
+                            </h3>
+                            <p class="box-description">Our social media accounts on other platforms</p>
+                        </div>
+                    </div>
+                </a>
+
+         <!-- Box 4 -->
+                <a href="#" class="box" data-glow-color="#C13584" target="_blank" rel="noopener noreferrer">
+                    <div class="box-content">
+                        <div class="box-avatar">
+                            <img src="https://dl.dropboxusercontent.com/scl/fi/7jas9l9t8f291joqqb5o6/1000089237.jpg?rlkey=mg5mzmtmpzk2l210woufg5pls&st=p9redit4&dl=0" alt="Instagram Avatar" class="avatar-img">
+                        </div>
+                        <div class="box-info">
+                            <h3 class="box-name">
+                                Instagram Social
+                            </h3>
+                            <p class="box-description">Our social media accounts on other platforms</p>
+                        </div>
+                    </div>
+                </a>
+
+
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 Our Profile. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="https://dl.dropboxusercontent.com/scl/fi/t02mu7bu7iea4wchfqeg7/personalhub.js?rlkey=3gvywtrlgd7gdus0hg7kwagvz&st=i57pq2hs&dl=0"></script>
+</body>
+</html>
